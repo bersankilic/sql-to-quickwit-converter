@@ -11,31 +11,30 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
-import javax.swing.plaf.nimbus.State;
 
 public class QuickwitQueryConverter {
     
-    // Bu metot, verilen SQL Statement nesnesini Quickwit sorgusuna çevirir
+    // sql statementi quickwit sorgusuna çevir
     public String convert(Statement sqlStatement) {
         if (sqlStatement instanceof Select) {
-            // Eğer SQL sorgusu bir Select sorgusu ise, bu sorguyu Quickwit sorgusuna çevirir
+            // eğer sql sorgusu bir select sorgusu ise convertSelectQuery metodunu çağır
             return convertSelectQuery((Select) sqlStatement);
         }
-        // Diğer SQL sorgu türleri için dönüşüm mantığı buraya eklenebilir
+        // diğer sql sorgu türleri için dönüşüm kodları buraya eklenecek
         return null;
     }
     
     
     
-    // Bu metot, Select sorgusunu Quickwit sorgusuna çevirme mantığını içerir
+    // select sorgusunu quickwit sorgusuna çeviren metot
     private String convertSelectQuery(Select select) {
         PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
         
-        // Tablo ismini al
+        // tablo ismini al
         String tableName = plainSelect.getFromItem().toString();
-        System.out.println("tablo ismi : " + tableName);
+        System.out.println("tablo ismi : " + tableName); //kontrol amaçlı ekledim
         
-        // Select edilen kolonları al
+        // kolon isimlerini al
         StringBuilder fields = new StringBuilder();
         for(SelectItem item : plainSelect.getSelectItems()){
             if(fields.length() > 0){
@@ -43,52 +42,49 @@ public class QuickwitQueryConverter {
             }
             fields.append(item.toString());
         }
-        System.out.println("sütun : " + fields.toString());
+        System.out.println("sütun : " + fields.toString()); //kontrol amaçlı ekledim
         System.out.println("-----------------\n");
         
-        // WHERE koşulunu al
-        String whereClause = "";
+        // where koşulunu al
+        String whereClause = ""; // where koşulu yoksa boş string
         if (plainSelect.getWhere() != null) {
-            whereClause = convertExpressionToQuickwit(plainSelect.getWhere());
+            whereClause = convertExpressionToQuickwit(plainSelect.getWhere()); // where koşulunu quickwit sorgusuna çevir
         }
-        
-        
-        
-        // Quickwit sorgusunu oluştur
-        //String quickwitQuery = String.format("(%s) %s", fields.toString(), whereClause);
+        // quickwit sorgusunu oluştur
+        // String quickwitQuery = String.format("(%s) %s", fields.toString(), whereClause);
         String quickwitQuery = String.format(whereClause);
         return quickwitQuery;
     }
     
-    // Bu metot, SQL WHERE ifadesini Quickwit sorgusuna çevirir
-    private String convertExpressionToQuickwit(Expression expression) {
-        if (expression instanceof AndExpression) {
+    // where ifadesini quickwit sorgusuna çeviren metot
+    private String convertExpressionToQuickwit(Expression expression) { // expression ifadesini alır
+        if (expression instanceof AndExpression) { // eğer and ifadesi ise
             AndExpression andExpression = (AndExpression) expression;
             return String.format("(%s AND %s)",
                     convertExpressionToQuickwit(andExpression.getLeftExpression()),
                     convertExpressionToQuickwit(andExpression.getRightExpression()));
-        } else if (expression instanceof OrExpression) {
+        } else if (expression instanceof OrExpression) { // eğer or ifadesi ise
             OrExpression orExpression = (OrExpression) expression;
             return String.format("(%s OR %s)",
                     convertExpressionToQuickwit(orExpression.getLeftExpression()),
                     convertExpressionToQuickwit(orExpression.getRightExpression()));
-        } else if (expression instanceof EqualsTo) {
+        } else if (expression instanceof EqualsTo) { // eğer eşittir ifadesi ise
             EqualsTo equalsTo = (EqualsTo) expression;
             return String.format("%s:%s",
                     equalsTo.getLeftExpression().toString(),
                     equalsTo.getRightExpression().toString());
-        } else if (expression instanceof GreaterThan) {
+        } else if (expression instanceof GreaterThan) { // eğer büyüktür ifadesi ise
             GreaterThan greaterThan = (GreaterThan) expression;
             return String.format("%s:>%s",
                     greaterThan.getLeftExpression().toString(),
                     greaterThan.getRightExpression().toString());
-        } else if (expression instanceof MinorThan) {
+        } else if (expression instanceof MinorThan) { // eğer küçüktür ifadesi ise
             MinorThan minorThan = (MinorThan) expression;
             return String.format("%s:<%s",
                     minorThan.getLeftExpression().toString(),
                     minorThan.getRightExpression().toString());
         } else {
-            return expression.toString();
+            return expression.toString(); // diğer durumlar için expression'ı string'e çevirip döndür
         }
         
         

@@ -12,8 +12,4 @@ public class ParserApplication {
         SpringApplication.run(ParserApplication.class, args);
     }
     
- 
-    
-    
-    
 }

@@ -10,37 +10,36 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @RestController
-public class QueryController {
+public class QueryController { // HTTP isteklerini dinleyen ve işleyen sınıf
     
     private final SQLParser sqlParser = new SQLParser();
     private final QuickwitQueryConverter queryConverter = new QuickwitQueryConverter();
     
     @Autowired
-    private WebClient.Builder webClientBuilder;
+    private WebClient.Builder webClientBuilder; // HTTP istekleri yapmak için kullanılacak WebClient nesnesi
     
     
-    // Bu endpoint, POST isteği ile gelen SQL sorgusunu alır ve Quickwit sorgusuna dönüştürür
+    // bu endpoint post isteği ile gelen sql sorgusunu alacak ve quickwit sorgusuna dönüştürecek
     @PostMapping("/convert-sql")
     public String convertSQLToQuickwit(@RequestBody String sqlQuery) {
         try {
-            // Gelen SQL sorgusunu parse eder
+            // gelen sql sorgusunu parse eder
             Statement statement = sqlParser.parseSQL(sqlQuery);
-            // Parse edilen SQL sorgusunu Quickwit sorgusuna dönüştürür
+            // parse edilen sql sorgusunu Quickwit sorgusuna dönüştürür
             String quickwitQuery = queryConverter.convert(statement);
-            //Quickwit sorgusunu HTTP endpointine yolla ve cevabı al
+            // quickwit sorgusunu HTTP endpointine yolla ve cevabı al
             String response = webClientBuilder.build()
                     .get()
                     .uri("http://localhost:7280/api/v1/quickwitte/search?query=" + quickwitQuery)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            //Alınan cevabı konsola yaz
+            // alınan cevabı konsola yaz
             System.out.println(response);
             return quickwitQuery;
         } catch (Exception e) {
             e.printStackTrace();
-            // Hata durumunda geri dönen mesaj
-            return "Error parsing or converting SQL query.";
+            return "Hata: " + e.getMessage();
         }
     }
 }
