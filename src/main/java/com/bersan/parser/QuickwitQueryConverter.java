@@ -33,6 +33,7 @@ public class QuickwitQueryConverter {
         
         // Tablo ismini al
         String tableName = plainSelect.getFromItem().toString();
+        System.out.println("tablo ismi : " + tableName);
         
         // Select edilen kolonları al
         StringBuilder fields = new StringBuilder();
@@ -42,6 +43,8 @@ public class QuickwitQueryConverter {
             }
             fields.append(item.toString());
         }
+        System.out.println("sütun : " + fields.toString());
+        System.out.println("-----------------\n");
         
         // WHERE koşulunu al
         String whereClause = "";
@@ -52,7 +55,8 @@ public class QuickwitQueryConverter {
         
         
         // Quickwit sorgusunu oluştur
-        String quickwitQuery = String.format("(%s) %s", fields.toString(), whereClause);
+        //String quickwitQuery = String.format("(%s) %s", fields.toString(), whereClause);
+        String quickwitQuery = String.format(whereClause);
         return quickwitQuery;
     }
     
@@ -75,12 +79,12 @@ public class QuickwitQueryConverter {
                     equalsTo.getRightExpression().toString());
         } else if (expression instanceof GreaterThan) {
             GreaterThan greaterThan = (GreaterThan) expression;
-            return String.format("%s>%s",
+            return String.format("%s:>%s",
                     greaterThan.getLeftExpression().toString(),
                     greaterThan.getRightExpression().toString());
         } else if (expression instanceof MinorThan) {
             MinorThan minorThan = (MinorThan) expression;
-            return String.format("%s<%s",
+            return String.format("%s:<%s",
                     minorThan.getLeftExpression().toString(),
                     minorThan.getRightExpression().toString());
         } else {
