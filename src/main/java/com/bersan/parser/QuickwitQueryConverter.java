@@ -11,6 +11,8 @@ import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
+import javax.swing.plaf.nimbus.State;
+
 public class QuickwitQueryConverter {
     
     // Bu metot, verilen SQL Statement nesnesini Quickwit sorgusuna çevirir
@@ -23,6 +25,8 @@ public class QuickwitQueryConverter {
         return null;
     }
     
+    
+    
     // Bu metot, Select sorgusunu Quickwit sorgusuna çevirme mantığını içerir
     private String convertSelectQuery(Select select) {
         PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
@@ -32,8 +36,8 @@ public class QuickwitQueryConverter {
         
         // Select edilen kolonları al
         StringBuilder fields = new StringBuilder();
-        for (SelectItem item : plainSelect.getSelectItems()) {
-            if (fields.length() > 0) {
+        for(SelectItem item : plainSelect.getSelectItems()){
+            if(fields.length() > 0){
                 fields.append(", ");
             }
             fields.append(item.toString());
@@ -44,6 +48,8 @@ public class QuickwitQueryConverter {
         if (plainSelect.getWhere() != null) {
             whereClause = convertExpressionToQuickwit(plainSelect.getWhere());
         }
+        
+        
         
         // Quickwit sorgusunu oluştur
         String quickwitQuery = String.format("(%s) %s", fields.toString(), whereClause);
@@ -80,5 +86,9 @@ public class QuickwitQueryConverter {
         } else {
             return expression.toString();
         }
+        
+        
+       
+        
     }
 }
