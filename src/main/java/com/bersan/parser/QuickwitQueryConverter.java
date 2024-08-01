@@ -3,6 +3,7 @@ package com.bersan.parser;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import net.sf.jsqlparser.expression.operators.relational.MinorThan;
@@ -57,7 +58,7 @@ public class QuickwitQueryConverter {
     }
     
     // where ifadesini quickwit sorgusuna çeviren metot
-    private String convertExpressionToQuickwit(Expression expression) { // expression ifadesini alır
+    String convertExpressionToQuickwit(Expression expression) { // expression ifadesini alır
         if (expression instanceof AndExpression) { // and ifadesi ise
             AndExpression andExpression = (AndExpression) expression;
             return String.format("(%s AND %s)",
@@ -83,7 +84,18 @@ public class QuickwitQueryConverter {
             return String.format("%s:<%s",
                     minorThan.getLeftExpression().toString(),
                     minorThan.getRightExpression().toString());
-        } else {
+        }
+        else if (expression instanceof Between) { // between ifadesi için destek
+            Between between = (Between) expression;
+            String fieldName = between.getLeftExpression().toString(); // alan adı
+            String lowerBound = between.getBetweenExpressionStart().toString(); //alt sınır
+            String upperBound = between.getBetweenExpressionEnd().toString(); // üst sınır
+            return String.format("%s:[%s TO %s]",
+                    fieldName,
+                    lowerBound,
+                    upperBound);
+        }
+        else {
             return expression.toString(); // diğer durumlar için expression'ı stringe çevirip döndür
         }
         
