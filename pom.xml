@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.bersan</groupId>
-    <artifactId>parser</artifactId>
+    <artifactId>sql-to-quickwit</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>parser</name>
-    <description>parser</description>
+    <name>sql-to-quickwit</name>
+    <description>sql-to-quickwit</description>
     <url/>
     <licenses>
         <license/>

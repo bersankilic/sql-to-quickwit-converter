@@ -58,33 +58,33 @@ public class QuickwitQueryConverter {
     
     // where ifadesini quickwit sorgusuna çeviren metot
     private String convertExpressionToQuickwit(Expression expression) { // expression ifadesini alır
-        if (expression instanceof AndExpression) { // eğer and ifadesi ise
+        if (expression instanceof AndExpression) { // and ifadesi ise
             AndExpression andExpression = (AndExpression) expression;
             return String.format("(%s AND %s)",
                     convertExpressionToQuickwit(andExpression.getLeftExpression()),
                     convertExpressionToQuickwit(andExpression.getRightExpression()));
-        } else if (expression instanceof OrExpression) { // eğer or ifadesi ise
+        } else if (expression instanceof OrExpression) { //or ifadesi ise
             OrExpression orExpression = (OrExpression) expression;
             return String.format("(%s OR %s)",
                     convertExpressionToQuickwit(orExpression.getLeftExpression()),
                     convertExpressionToQuickwit(orExpression.getRightExpression()));
-        } else if (expression instanceof EqualsTo) { // eğer eşittir ifadesi ise
+        } else if (expression instanceof EqualsTo) { // eşittir ifadesi ise
             EqualsTo equalsTo = (EqualsTo) expression;
             return String.format("%s:%s",
                     equalsTo.getLeftExpression().toString(),
                     equalsTo.getRightExpression().toString());
-        } else if (expression instanceof GreaterThan) { // eğer büyüktür ifadesi ise
+        } else if (expression instanceof GreaterThan) { // büyüktür ifadesi ise
             GreaterThan greaterThan = (GreaterThan) expression;
             return String.format("%s:>%s",
                     greaterThan.getLeftExpression().toString(),
                     greaterThan.getRightExpression().toString());
-        } else if (expression instanceof MinorThan) { // eğer küçüktür ifadesi ise
+        } else if (expression instanceof MinorThan) { // küçüktür ifadesi ise
             MinorThan minorThan = (MinorThan) expression;
             return String.format("%s:<%s",
                     minorThan.getLeftExpression().toString(),
                     minorThan.getRightExpression().toString());
         } else {
-            return expression.toString(); // diğer durumlar için expression'ı string'e çevirip döndür
+            return expression.toString(); // diğer durumlar için expression'ı stringe çevirip döndür
         }
         
         
