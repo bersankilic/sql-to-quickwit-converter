@@ -2,6 +2,7 @@ package com.bersan.parser;
 
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
@@ -100,6 +101,23 @@ public class QuickwitQueryConverterTest {
         String result = converter.convertExpressionToQuickwit(andExpression);
         
         assertEquals("(field1:value1 AND field2:value2)", result);
+    }
+    
+    @Test
+    void convertExpressionToQuickwit_shouldConvertOrExpression() {
+        OrExpression orExpression = mock(OrExpression.class);
+        Expression leftExpression = mock(Expression.class);
+        Expression rightExpression = mock(Expression.class);
+        
+        when(orExpression.getLeftExpression()).thenReturn(leftExpression);
+        when(orExpression.getRightExpression()).thenReturn(rightExpression);
+        when(leftExpression.toString()).thenReturn("field1:value1");
+        when(rightExpression.toString()).thenReturn("field2:value2");
+        
+        QuickwitQueryConverter converter = new QuickwitQueryConverter();
+        String result = converter.convertExpressionToQuickwit(orExpression);
+        
+        assertEquals("(field1:value1 OR field2:value2)", result);
     }
     
     
