@@ -3,6 +3,7 @@ package com.bersan.parser;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.Between;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -46,6 +47,23 @@ public class QuickwitQueryConverterTest {
         
         assertEquals("field:value", result);
     }
-
+    
+    @Test
+    void convertExpressionToQuickwit_shouldConvertGreaterThanExpression() {
+        GreaterThan greaterThan = mock(GreaterThan.class);
+        Expression leftExpression = mock(Expression.class);
+        Expression rightExpression = mock(Expression.class);
+        
+        when(greaterThan.getLeftExpression()).thenReturn(leftExpression);
+        when(greaterThan.getRightExpression()).thenReturn(rightExpression);
+        when(leftExpression.toString()).thenReturn("field");
+        when(rightExpression.toString()).thenReturn("10");
+        
+        QuickwitQueryConverter converter = new QuickwitQueryConverter();
+        String result = converter.convertExpressionToQuickwit(greaterThan);
+        
+        assertEquals("field:>10", result);
+    }
+    
     
 }
