@@ -1,6 +1,6 @@
 # SQL to Quickwit Query Converter
 
-Bu proje, SQL sorgularını Quickwit sorgularına dönüştürmek için geliştirilmiş bir prototiptir. Proje, Java programlama dili ve Maven yapılandırma aracı kullanılarak geliştirilmiştir. Spring Boot çerçevesi ile yapılandırılmıştır.
+Bu proje, SQL sorgularını Quickwit sorgularına dönüştürmek için geliştirilmiş bir prototiptir. Proje, Java programlama dili ve Maven yapılandırma aracı kullanılarak geliştirilmiştir. Spring Boot framework ile yapılandırılmıştır.
 
 ## Özellikler
 
