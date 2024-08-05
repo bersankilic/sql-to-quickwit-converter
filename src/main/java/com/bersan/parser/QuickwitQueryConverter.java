@@ -3,10 +3,7 @@ package com.bersan.parser;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.Between;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.expression.operators.relational.MinorThan;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -95,12 +92,33 @@ public class QuickwitQueryConverter {
                     lowerBound,
                     upperBound);
         }
+        else if (expression instanceof LikeExpression) { // LIKE ifadesi için destek
+            LikeExpression likeExpression = (LikeExpression) expression;
+            String fieldName = likeExpression.getLeftExpression().toString();
+            String pattern = likeExpression.getRightExpression().toString();
+            
+            // LIKE ifadesini Quickwit'in term prefix veya phrase prefix ifadelerine çevir
+            String quickwitPattern = convertLikePatternToQuickwit(pattern);
+            
+            return String.format("%s:%s", fieldName, quickwitPattern);
+        }
         else {
             return expression.toString(); // diğer durumlar için expression'ı stringe çevirip döndür
         }
-        
-        
-       
-        
     }
+    private String convertLikePatternToQuickwit(String likePattern) {
+        // % karakterini * karakterine çevir
+        String quickwitPattern = likePattern.replace("%", "");
+        
+        
+        //LIKE pattern'inde olduğu gibi sonunda * ekle
+        if (!quickwitPattern.endsWith("*")) {
+            quickwitPattern = quickwitPattern + "*";
+        }
+ 
+        
+        return quickwitPattern;
+    }
+    
+    
 }

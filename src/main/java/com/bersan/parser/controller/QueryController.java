@@ -30,7 +30,7 @@ public class QueryController { // HTTP isteklerini dinleyen ve işleyen sınıf
             // quickwit sorgusunu HTTP endpointine yolla ve cevabı al
             String response = webClientBuilder.build()
                     .get()
-                    .uri("http://localhost:7280/api/v1/quickwitte/search?query=" + quickwitQuery)
+                    .uri("http://localhost:7280/api/v1/stackoverflow/search?query=" + quickwitQuery)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();

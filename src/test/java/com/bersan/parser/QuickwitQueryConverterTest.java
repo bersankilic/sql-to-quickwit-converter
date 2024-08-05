@@ -3,10 +3,7 @@ package com.bersan.parser;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.Between;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.expression.operators.relational.GreaterThan;
-import net.sf.jsqlparser.expression.operators.relational.MinorThan;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -118,6 +115,74 @@ public class QuickwitQueryConverterTest {
         String result = converter.convertExpressionToQuickwit(orExpression);
         
         assertEquals("(field1:value1 OR field2:value2)", result);
+    }
+    
+    @Test
+    void convertExpressionToQuickwit_shouldConvertLikeExpressionWithWildcard() {
+        LikeExpression likeExpression = mock(LikeExpression.class);
+        Expression leftExpression = mock(Expression.class);
+        Expression rightExpression = mock(Expression.class);
+        
+        when(likeExpression.getLeftExpression()).thenReturn(leftExpression);
+        when(likeExpression.getRightExpression()).thenReturn(rightExpression);
+        when(leftExpression.toString()).thenReturn("field");
+        when(rightExpression.toString()).thenReturn("%value%");
+        
+        QuickwitQueryConverter converter = new QuickwitQueryConverter();
+        String result = converter.convertExpressionToQuickwit(likeExpression);
+        
+        assertEquals("field:value*", result);
+    }
+    
+    @Test
+    void convertExpressionToQuickwit_shouldConvertLikeExpressionWithoutWildcard() {
+        LikeExpression likeExpression = mock(LikeExpression.class);
+        Expression leftExpression = mock(Expression.class);
+        Expression rightExpression = mock(Expression.class);
+        
+        when(likeExpression.getLeftExpression()).thenReturn(leftExpression);
+        when(likeExpression.getRightExpression()).thenReturn(rightExpression);
+        when(leftExpression.toString()).thenReturn("field");
+        when(rightExpression.toString()).thenReturn("value");
+        
+        QuickwitQueryConverter converter = new QuickwitQueryConverter();
+        String result = converter.convertExpressionToQuickwit(likeExpression);
+        
+        assertEquals("field:value*", result);
+    }
+    
+    @Test
+    void convertExpressionToQuickwit_shouldConvertLikeExpressionWithLeadingWildcard() {
+        LikeExpression likeExpression = mock(LikeExpression.class);
+        Expression leftExpression = mock(Expression.class);
+        Expression rightExpression = mock(Expression.class);
+        
+        when(likeExpression.getLeftExpression()).thenReturn(leftExpression);
+        when(likeExpression.getRightExpression()).thenReturn(rightExpression);
+        when(leftExpression.toString()).thenReturn("field");
+        when(rightExpression.toString()).thenReturn("%value");
+        
+        QuickwitQueryConverter converter = new QuickwitQueryConverter();
+        String result = converter.convertExpressionToQuickwit(likeExpression);
+        
+        assertEquals("field:value*", result);
+    }
+    
+    @Test
+    void convertExpressionToQuickwit_shouldConvertLikeExpressionWithTrailingWildcard() {
+        LikeExpression likeExpression = mock(LikeExpression.class);
+        Expression leftExpression = mock(Expression.class);
+        Expression rightExpression = mock(Expression.class);
+        
+        when(likeExpression.getLeftExpression()).thenReturn(leftExpression);
+        when(likeExpression.getRightExpression()).thenReturn(rightExpression);
+        when(leftExpression.toString()).thenReturn("field");
+        when(rightExpression.toString()).thenReturn("value%");
+        
+        QuickwitQueryConverter converter = new QuickwitQueryConverter();
+        String result = converter.convertExpressionToQuickwit(likeExpression);
+        
+        assertEquals("field:value*", result);
     }
     
     
