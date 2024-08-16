@@ -1,4 +1,4 @@
-package com.bersan.parser;
+package com.ulak.quickwit.sql.parser;
 
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.Statement;
