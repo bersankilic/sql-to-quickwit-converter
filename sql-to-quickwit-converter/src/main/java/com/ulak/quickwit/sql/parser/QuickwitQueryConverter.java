@@ -16,12 +16,23 @@ public class QuickwitQueryConverter {
     public String convert(Statement sqlStatement) {
         if (sqlStatement instanceof Select) {
             // eğer sql sorgusu bir select sorgusu ise convertSelectQuery metodunu çağır
-            return convertSelectQuery((Select) sqlStatement);
+            String query = convertSelectQuery((Select) sqlStatement);
+            String json = String.format("""
+                    {
+                      "aggs": {},
+                      "count_all": true,
+                      "format": "json",
+                      "query": "%s",
+                      "start_offset": 0,
+                      "start_timestamp": 0,
+                      "search_field": ""
+                    }
+                    """, query);
+            return json;
         }
         // diğer sql sorgu türleri için dönüşüm kodları buraya eklenecek
         return null;
     }
-    
     
     
     // select sorgusunu quickwit sorgusuna çeviren metot
@@ -34,8 +45,8 @@ public class QuickwitQueryConverter {
         
         // kolon isimlerini al
         StringBuilder fields = new StringBuilder();
-        for(SelectItem item : plainSelect.getSelectItems()){
-            if(fields.length() > 0){
+        for (SelectItem item : plainSelect.getSelectItems()) {
+            if (fields.length() > 0) {
                 fields.append(", ");
             }
             fields.append(item.toString());
@@ -58,12 +69,12 @@ public class QuickwitQueryConverter {
     String convertExpressionToQuickwit(Expression expression) { // expression ifadesini alır
         if (expression instanceof AndExpression) { // and ifadesi ise
             AndExpression andExpression = (AndExpression) expression;
-            return String.format("(%s AND %s)",
+            return String.format("%s AND %s",
                     convertExpressionToQuickwit(andExpression.getLeftExpression()),
                     convertExpressionToQuickwit(andExpression.getRightExpression()));
         } else if (expression instanceof OrExpression) { //or ifadesi ise
             OrExpression orExpression = (OrExpression) expression;
-            return String.format("(%s OR %s)",
+            return String.format("%s OR %s",
                     convertExpressionToQuickwit(orExpression.getLeftExpression()),
                     convertExpressionToQuickwit(orExpression.getRightExpression()));
         } else if (expression instanceof EqualsTo) { // eşittir ifadesi ise
@@ -81,8 +92,7 @@ public class QuickwitQueryConverter {
             return String.format("%s:<%s",
                     minorThan.getLeftExpression().toString(),
                     minorThan.getRightExpression().toString());
-        }
-        else if (expression instanceof Between) { // between ifadesi için destek
+        } else if (expression instanceof Between) { // between ifadesi için destek
             Between between = (Between) expression;
             String fieldName = between.getLeftExpression().toString(); // alan adı
             String lowerBound = between.getBetweenExpressionStart().toString(); //alt sınır
@@ -91,8 +101,7 @@ public class QuickwitQueryConverter {
                     fieldName,
                     lowerBound,
                     upperBound);
-        }
-        else if (expression instanceof LikeExpression) { // LIKE ifadesi için destek
+        } else if (expression instanceof LikeExpression) { // LIKE ifadesi için destek(SQL tarafında LIKE ifadesi büyük yazılmazsa jsql parser hatası verir)
             LikeExpression likeExpression = (LikeExpression) expression;
             String fieldName = likeExpression.getLeftExpression().toString();
             String pattern = likeExpression.getRightExpression().toString();
@@ -101,21 +110,21 @@ public class QuickwitQueryConverter {
             String quickwitPattern = convertLikePatternToQuickwit(pattern);
             
             return String.format("%s:%s", fieldName, quickwitPattern);
-        }
-        else {
+        } else {
             return expression.toString(); // diğer durumlar için expression'ı stringe çevirip döndür
         }
     }
+    
     private String convertLikePatternToQuickwit(String likePattern) {
-        // % karakterini * karakterine çevir
+        // % karakterini sil
         String quickwitPattern = likePattern.replace("%", "");
         
         
-        //LIKE pattern'inde olduğu gibi sonunda * ekle
+        //field sonuna * ekle
         if (!quickwitPattern.endsWith("*")) {
             quickwitPattern = quickwitPattern + "*";
         }
- 
+        
         
         return quickwitPattern;
     }

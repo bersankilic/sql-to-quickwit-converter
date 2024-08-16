@@ -1,9 +1,12 @@
 package com.ulak.quickwit.sql.parser.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.ulak.quickwit.sql.parser.QuickwitQueryConverter;
 import com.ulak.quickwit.sql.parser.SQLParser;
 import net.sf.jsqlparser.statement.Statement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,19 +30,22 @@ public class QueryController { // HTTP isteklerini dinleyen ve işleyen sınıf
             Statement statement = sqlParser.parseSQL(sqlQuery);
             // parse edilen sql sorgusunu Quickwit sorgusuna dönüştürür
             String quickwitQuery = queryConverter.convert(statement);
-            // quickwit sorgusunu HTTP endpointine yolla ve cevabı al
+            // quickwit sorgusunu HTTP endpointine gönder ve cevabı al
             String response = webClientBuilder.build()
-                    .get()
-                    .uri("http://localhost:7280/api/v1/stackoverflow/search?query=" + quickwitQuery)
+                    .post()
+                    .uri("http://localhost:7280/api/v1/stackoverflow/search")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(quickwitQuery)
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
-            // alınan cevabı konsola yaz
-            System.out.println(response);
+            // alınan cevabı json formatına getirip konsola yaz
+            ObjectWriter ow = new ObjectMapper().writerWithDefaultPrettyPrinter();
+            String responseJson = ow.writeValueAsString(new ObjectMapper().readTree(response));
+            System.out.println(responseJson);
             return quickwitQuery;
         } catch (Exception e) {
-            e.printStackTrace();
-            return "Hata: " + e.getMessage();
+            return "Error: " + e.getMessage();
         }
     }
 }
